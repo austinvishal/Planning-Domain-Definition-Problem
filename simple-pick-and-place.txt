@@ -1,0 +1,67 @@
+(define 
+	
+	(domain simple-pick-and-place)
+	
+	(:requirements :negative-preconditions :fluents :STRIPS 	:typing :adl)
+	
+	(:types
+		object	
+		location
+		humanoid-arm
+	)
+	
+	(:predicates
+		(is-at ?o - object ?l - location)
+		(holds ?ha - humanoid-arm ?o - object)
+		(is-free ?ha - humanoid-arm)
+		(positioned-at ?ha - humanoid-arm ?l - location)
+		(connected ?l1 - location ?l2 - location)
+	)
+	
+	(:functions
+		(max-weight ?ha - humanoid-arm)
+		(weight ?o - object)
+	)
+	
+	(:action pick
+		:parameters
+		(?ha - humanoid-arm ?o - object ?l - location)
+		
+		:precondition (and
+			(is-free ?ha)
+			(positioned-at ?ha ?l)
+			(is-at ?o ?l)
+			(not (< (max-weight ?ha)(weight ?o))))
+		
+		:effect
+			(and (holds ?ha ?o)
+			(not (is-free ?ha)))
+	)
+
+	(:action move
+		:parameters
+		(?ha - humanoid-arm ?l1 - location ?l2 - location)
+		
+		:precondition
+		(and (positioned-at ?ha ?l1) (connected ?l1 ?l2))
+		
+		:effect (and 
+			(positioned-at ?ha ?l2) 
+			(not (positioned-at ?ha ?l1))
+			(forall (?o - object)
+				(when (and (holds ?ha ?o))
+				(and (is-at ?o ?l2) (not (is-at ?o ?l1))))
+			)
+		)
+	)
+
+	(:action place
+		:parameters
+		(?ha - humanoid-arm ?o - object ?l - location)
+		
+		:precondition
+		(and (holds ?ha ?o) (positioned-at ?ha ?l) (is-at ?o 			?l))
+		
+		:effect (and (is-free ?ha) (not (holds ?ha ?o)))
+	)
+)

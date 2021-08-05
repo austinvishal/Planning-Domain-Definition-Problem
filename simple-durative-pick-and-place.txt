@@ -1,0 +1,88 @@
+(define 
+
+	(domain simple-pick-and-place)
+
+	(:requirements 
+		:durative-actions 
+		:negative-preconditions
+		:fluents 
+		:STRIPS
+		:typing
+		:adl
+	)
+	
+	(:types
+		object	
+		location
+		humanoid-arm
+	)
+	
+	(:predicates
+		(is-at ?o - object ?l - location)
+		(holds ?ha - humanoid-arm ?o - object)
+		(is-free ?ha - humanoid-arm)
+		(positioned-at ?ha - humanoid-arm ?l - location)
+		(connected ?l1 - location ?l2 - location)
+	)
+	
+	(:functions
+		(max-weight ?ha - humanoid-arm)
+		(weight ?o - object)
+	)
+	
+	(:durative-action pick
+	
+		:parameters
+		(?ha - humanoid-arm ?o - object ?l - location)
+		
+		:duration (= ?duration 2)
+		
+		:condition (and
+			(at start (is-free ?ha))
+			(at start (positioned-at ?ha ?l))
+			(at start (is-at ?o ?l))
+			(at start (not(<(max-weight ?ha)(weight ?o)))))
+		
+		:effect (and 
+			(at end (holds ?ha ?o))
+			(at end (not (is-free ?ha)))
+			(at end (not (is-at ?o ?l))))
+	)
+
+	(:durative-action move
+
+		:parameters
+		(?ha - humanoid-arm ?l1 - location ?l2 - location)
+		
+		:duration (= ?duration 3)
+		
+		:condition (and 
+			(at start (positioned-at ?ha ?l1))
+			(at start (connected ?l1 ?l2)))
+		
+		:effect (and 
+			(at end (positioned-at ?ha ?l2))
+			(at start (not (positioned-at ?ha ?l1)))
+			;;(over all (?o - object)
+			;;	(when (and (at start (holds ?ha ?o)))
+			;;		(and (at end (is-at ?o ?l2)) (at end (not (is-at ?o ?l1)))))
+			;;)
+		)
+	)
+
+	(:durative-action place
+		:parameters
+		(?ha - humanoid-arm ?o - object ?l - location)
+		
+		:duration (= ?duration 2)
+		
+		:condition (and 
+			(at start (holds ?ha ?o))
+			(at start (positioned-at ?ha ?l)))
+		
+		:effect (and 
+			(at end (is-at ?o ?l))
+			(at end (is-free ?ha))
+			(at end (not (holds ?ha ?o))))
+		)
+	)

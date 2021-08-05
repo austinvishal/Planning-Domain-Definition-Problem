@@ -1,0 +1,39 @@
+(define
+
+	(problem simple-pick-and-place-problem)
+
+	(:domain simple-pick-and-place)
+
+	(:objects
+		mac-humanoid-arm1 - humanoid-arm 
+		mac-humanoid-arm2 - humanoid-arm 
+		area1 - location
+		area2 - location
+		area3 - location
+		my-tennis-ball - object
+		my-rugby-ball - object
+	)
+
+	(:init
+		(is-at my-tennis-ball area1)
+		(is-at my-rugby-ball area2)
+		(is-free mac-humanoid-arm1)
+		(is-free mac-humanoid-arm2)
+		(positioned-at mac-humanoid-arm1 area3)
+		(positioned-at mac-humanoid-arm2 area3)
+		(connected area1 area2)
+		(connected area2 area1)
+		;;(connected area1 area3)
+		;;(connected area3 area1)
+		(connected area2 area3)
+		(connected area3 area2)
+		(= (max-weight mac-humanoid-arm1) 2)
+		(= (max-weight mac-humanoid-arm2) 3)
+		(= (weight my-tennis-ball) 2.5)
+		(= (weight my-rugby-ball) 2.5)
+	)
+
+	(:goal (and (is-at my-rugby-ball area1) (is-at my-tennis-ball area2)))
+	(:metric minimize (total-time))
+)
+	
